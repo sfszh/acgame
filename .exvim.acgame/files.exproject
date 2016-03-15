@@ -1,0 +1,53 @@
+" Press <F1> for help
+
+-[F]acgame {
+ |-[F]client {
+ | |-[F]assets {
+ | | |-[F]levels {
+ | | | |-battle.json
+ | | | |-level1.json }
+ | | |
+ | | |-[F]maps {
+ | |   |-map1.json
+ | |   |-map1.tmx } }
+ | |
+ | |-[F]js {
+ | | |-[F]prefabs {
+ | | | |-[F]HUD {
+ | | | | |-ActionMessage.js
+ | | | | |-AttackMenuItem.js
+ | | | | |-EnemyMenuItem.js
+ | | | | |-Menu.js
+ | | | | |-MenuItem.js
+ | | | | |-PlayerMenuItem.js
+ | | | | |-ShowStat.js }
+ | | | |
+ | | | |-[F]Units {
+ | | | | |-EnemyUnit.js
+ | | | | |-PlayerUnit.js
+ | | | | |-Unit.js }
+ | | | |
+ | | | |-[F]world {
+ | | | | |-EnemySpawner.js
+ | | | | |-Player.js }
+ | | | |
+ | | | |-Prefab.js
+ | | | |-TextPrefab.js
+ | | | |-TilePrefab.js }
+ | | |
+ | | |-[F]states {
+ | | | |-BattleState.js
+ | | | |-BootState.js
+ | | | |-LoadingState.js
+ | | | |-WorldState.js }
+ | | |
+ | | |-main.js
+ | | |-phaser.js
+ | | |-priority-queue.min.js
+ | | |-Utils.js }
+ | |
+ | |-index.html }
+ |
+ |-acgame.exvim }
+
+
