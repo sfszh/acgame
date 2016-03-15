@@ -14,10 +14,10 @@ project_name = 'acgame'
 folder_filter_mode = include -- { include, exclude }
 folder_filter +=
 file_filter +=
-file_ignore_pattern +=
+file_ignore_pattern += *.png,*.bmp 
 
 -- Editing:
-indent = 2
+indent = 4
 
 -- Building:
 builder = gulp -- { gulp, grunt, gcc, xcode, vs, unity3d, ... }
