@@ -15,7 +15,7 @@ RPG.EnemySpawner.prototype.constructor = RPG.EnemySpawner;
 
 RPG.EnemySpawner.prototype.update = function () {
     "use strict";
-    //this.overlapping = this.game_state.game.physics.arcade.overlap(this, this.game_state.groups.players, this.check_for_spawn, null, this);
+    this.overlapping = this.game_state.game.physics.arcade.overlap(this, this.game_state.groups.players, this.check_for_spawn, null, this);
 };
 
 RPG.EnemySpawner.prototype.check_for_spawn = function () {
