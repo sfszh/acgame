@@ -27,7 +27,11 @@ RPG.WorldState.prototype.init = function (level_data, extra_parameters) {
     this.game.physics.arcade.gravity.y = 0;
     
     // create map and set tileset
+    // this.level_data.map = RPG.map;
     this.map = this.game.add.tilemap(this.level_data.map.key);
+    console.log(this.level_data.map);
+
+
     tileset_index = 0;
     this.map.tilesets.forEach(function (tileset) {
         this.map.addTilesetImage(tileset.name, this.level_data.map.tilesets[tileset_index]);

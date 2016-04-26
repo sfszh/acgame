@@ -1,0 +1,16 @@
+{
+    "assets": {
+        "dungeon_tileset": {"type": "image", "source": "assets/images/terrains.png"},
+        "background_image": {"type": "image", "source":"assets/images/rectangle.png"},
+        "win_image":{"type":"image", "source":"assets/images/win.png"},
+        "lose_image":{"type":"image", "source":"assets/images/lose.png"} },
+        "hero_spritesheet": {"type": "spritesheet", "source": "assets/images/player.png", "frame_width": 31, "frame_height": 30},
+        "enemy_image": {"type": "image", "source": "assets/images/demon.png"},
+       // "exit_image": {"type": "image", "source": "assets/images/portal.png"},
+    "groups": [
+        "doors",
+        "exits",
+        "enemies",
+        "heroes"
+    ]    
+}

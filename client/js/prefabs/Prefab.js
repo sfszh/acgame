@@ -1,6 +1,6 @@
-var RPG = RPG || {};
+var ProceduralGeneration = ProceduralGeneration || {};
 
-RPG.Prefab = function (game_state, name, position, properties) {
+ProceduralGeneration.Prefab = function (game_state, name, position, properties) {
     "use strict";
     Phaser.Sprite.call(this, game_state.game, position.x, position.y, properties.texture);
     
@@ -8,6 +8,10 @@ RPG.Prefab = function (game_state, name, position, properties) {
     
     this.name = name;
     
+    if (!this.game_state.groups[properties.group]) {
+        console.log(properties.group);
+        console.log("group do not exist");
+    }
     this.game_state.groups[properties.group].add(this);
     this.frame = +properties.frame;
     
@@ -18,5 +22,5 @@ RPG.Prefab = function (game_state, name, position, properties) {
     this.game_state.prefabs[name] = this;
 };
 
-RPG.Prefab.prototype = Object.create(Phaser.Sprite.prototype);
-RPG.Prefab.prototype.constructor = RPG.Prefab;
+ProceduralGeneration.Prefab.prototype = Object.create(Phaser.Sprite.prototype);
+ProceduralGeneration.Prefab.prototype.constructor = ProceduralGeneration.Prefab;
