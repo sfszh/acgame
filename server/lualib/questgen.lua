@@ -97,9 +97,19 @@ function M.generatequest(depth)
     local motivation = M.random_from(M.random_from(M.motivations))
     print("Generating a Quest for "..motivation.description .. ":" .. M.sequence_to_str(motivation.sequence))
     M.generate_step(motivation.sequence)
+    local fullstep = ''
+    fullstep = fullstep .. motivation.description .. '\n'
     for _, step in pairs(M.generated_steps) do
         print(step)
+        fullstep = fullstep .. step.. '\n'
     end
+    return fullstep
+end
+
+function M.init_onestep()
+    local motivation = M.random_from(M.random_from(M.motivations))
+    step_stack.push(motivation)
+    M.motivation = motivation.description
 end
 
 function M.random_from( t )
@@ -124,7 +134,6 @@ function M.generate_step(sequence)
             -- print("match")
             M.generate_step(step.sequence)
         else 
-
             M.depth = M.depth - 1
             M.generated_steps[#M.generated_steps + 1] = M.padding_by(M.depth).. action
             return
@@ -132,6 +141,56 @@ function M.generate_step(sequence)
         end
     end
 end
+
+step_stack = {}
+function step_stack.push(item)
+   step_stack[#step_stack+1]= item
+end
+
+function step_stack.pop()
+    step_stack[#step_stack] = nil
+end
+
+function step_stack.peak()
+    return step_stack[#step_stack]
+end
+
+
+function M.generate_one_step()
+    print("aaaa" .. #step_stack)
+    if #step_stack == 0 then
+        return "finished", ""
+    end
+    local cur_step = step_stack.peak()
+    local count = 0
+    for _,action in pairs(cur_step.sequence) do
+        count = count + 1
+    end
+    print("count " .. count)
+    if count == 0 then
+        step_stack.pop()
+        if #step_stack == 0 then
+            return "finished", ""
+        end
+        cur_step = step_stack.peak()
+    end
+    local next_action = nil
+    for _,action in pairs(cur_step.sequence) do
+        next_action = action
+        break
+    end
+    if next_action == nil then
+        return "finished", ""
+    end
+    table.remove(cur_step.sequence, 1)
+    -- expand
+    if string.match(next_action, '>.-$') == nil then
+        step_stack.push(M.random_from(M.actions[next_action]))
+    end
+    return cur_step.description, next_action
+
+end
+
 
 function M.sequence_to_str(sequence)
     local str = ""

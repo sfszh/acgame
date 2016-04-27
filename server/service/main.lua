@@ -13,11 +13,27 @@ function handler.on_open(ws)
     print(string.format("%d::open", ws.id))
 end
 
+local function generate_and_pack()
+   print("bbbbb")
+   local desc, action =  questgen.generate_one_step()
+   print("one step".. desc .. " " .. action)
+   return questgen.motivation .. '\n'..desc..'\n'..action
+end
+
 function handler.on_message(ws, message)
     print(string.format("%d receive:%s", ws.id, message))
-    -- if message == "map" then
-    -- print(all_text)
-    ws:send_text(all_text)
+    print("aaaaaaaaaa")
+    -- if message == "map" or message == "finish" then
+    if message == "map" then
+        questgen.init_onestep();
+        local all_text = generate_and_pack(a);
+        print("send" .. all_text);
+        ws:send_text(all_text);
+    else
+        local all_text = generate_and_pack();
+        print("send" .. all_text);
+        ws:send_text(all_text);
+    end
     -- end
     -- ws:close()
 end
@@ -57,12 +73,11 @@ local function lines_from(file)
     end
     return lines
 end
-
 skynet.start(function()
-    local maps = lines_from("etc/maps/map1.json")
-    for k,v in pairs(maps) do
-       all_text = all_text .. v
-    end
+    -- local maps = lines_from("etc/maps/map1.json")
+    -- for k,v in pairs(maps) do
+       -- all_text = all_text .. v
+    -- end
 
     local address = "0.0.0.0:8001"
     skynet.error("Listening "..address)
@@ -71,7 +86,12 @@ skynet.start(function()
        socket.start(id)
        pcall(handle_socket, id)
     end)
+    -- questgen.init_onestep()
+    -- questgen.generate_one_step()
+    -- repeat
+        -- local desc, action = questgen.generate_one_step()
+        -- print(desc .. " " .. action)
+    -- until(desc == "finished")
     -- output = os.execute('perl /home/vagrant/loc/acgame/server/lualib/gistfile1.pl')
-    questgen.generatequest(3)
     -- print(output)
 end)
