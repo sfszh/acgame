@@ -13,28 +13,27 @@ function handler.on_open(ws)
     print(string.format("%d::open", ws.id))
 end
 
-local function generate_and_pack()
-   print("bbbbb")
-   local desc, action =  questgen.generate_one_step()
-   print("one step".. desc .. " " .. action)
+local function generate_and_pack(is_win)
+   local desc, action =  questgen.generate_one_step(is_win)
+   print("one step ".. desc .. " " .. action)
    return questgen.motivation .. '\n'..desc..'\n'..action
 end
 
 function handler.on_message(ws, message)
     print(string.format("%d receive:%s", ws.id, message))
-    print("aaaaaaaaaa")
     -- if message == "map" or message == "finish" then
+    local all_text
     if message == "map" then
         questgen.init_onestep();
-        local all_text = generate_and_pack(a);
-        print("send" .. all_text);
-        ws:send_text(all_text);
+        all_text = generate_and_pack(true);
+    elseif message == "win" then
+        all_text = generate_and_pack(true);
     else
-        local all_text = generate_and_pack();
-        print("send" .. all_text);
-        ws:send_text(all_text);
+        all_text = generate_and_pack(false);
     end
     -- end
+    print("send" .. all_text);
+    ws:send_text(all_text);
     -- ws:close()
 end
 

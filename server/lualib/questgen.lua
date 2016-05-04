@@ -2,10 +2,11 @@ local M= {}
 
 
 M.actions = {
-    ['goto'] ={ 
+    ['goto'] ={
         {
             description = 'Just wander around and look',
-            sequence = {'>explore'}
+            sequence = {'>explore'},
+            level = 1
         }
     },
     ['learn'] ={
@@ -44,13 +45,34 @@ M.actions = {
     },
     ['kill'] = {
         {
-            description = 'Go someplace and kill somebody',
-            sequence = {'goto', '>kill'}
+            description = 'Go someplace and kill all the monsters',
+            sequence = {'goto', '>kill'},
+            level = 1
+        },
+        {
+            description = 'Go someplace and kill all the monsters',
+            sequence = {'goto', '>kill'},
+            level = 2
+        },
+        {
+            description = 'Go someplace and kill all the monsters',
+            sequence = {'goto', '>kill'},
+            level = 3
         }
-    }
+    },
 }
-
+---[[
+    function M.actions.Has_Level(name_type, level)
+        for _,action in pairs(M.actions[name_type]) do
+            if action.level == level then
+                return true
+            end
+        end
+        return false
+    end
+    --]]
 M.motivations = {
+   --[[
     ['knowledge'] = {
         {
             description = 'Deliver item for study',
@@ -58,28 +80,33 @@ M.motivations = {
         }
     },
     ['comfort'] = {
-        {   
-            description = 'Obtain luxuries', 
+        {
+            description = 'Obtain luxuries',
             sequence = {'get', 'goto', '>give'}
         },
-        {   
+        {
             description = 'Kill pests',
             sequence    = {'goto', '>damage', 'goto', '>report'}
         },
     },
+    --]]
     ['reputation'] = {
-        {   
-            description ='Obtain rare items',
+        --[[
+        {
+            description ='Obtainrare items',
             sequence    = {'get', 'goto', '>give'}
         },
-        {   
+        --]]
+        {
             description = 'Kill enemies',
-            sequence    = {'goto', 'kill', 'goto', '>report'}
+            sequence    = {'goto', 'kill', 'goto', '>report'},
         },
-        {   
+        --[[
+        {
             description = 'Visit a dangerous place',
             sequence    = {'goto', 'goto', '>report'}
         },
+        --]]
     },
 }
 
@@ -100,7 +127,7 @@ function M.generatequest(depth)
     local fullstep = ''
     fullstep = fullstep .. motivation.description .. '\n'
     for _, step in pairs(M.generated_steps) do
-        print(step)
+        --print(step)
         fullstep = fullstep .. step.. '\n'
     end
     return fullstep
@@ -110,12 +137,14 @@ function M.init_onestep()
     local motivation = M.random_from(M.random_from(M.motivations))
     step_stack.push(motivation)
     M.motivation = motivation.description
+    M.hard_level = 1
+    print("end of init_onestep " ..M.motivation) -- M.random_from(M.random_from(M.motivations)).description)
 end
 
 function M.random_from( t )
     local choice = "F"
     local n = 0
-    for i, o in pairs(t) do 
+    for i, o in pairs(t) do
         n = n + 1
         if math.random() < (1/n) then
             choice = o
@@ -133,7 +162,7 @@ function M.generate_step(sequence)
             M.depth = M.depth + 1
             -- print("match")
             M.generate_step(step.sequence)
-        else 
+        else
             M.depth = M.depth - 1
             M.generated_steps[#M.generated_steps + 1] = M.padding_by(M.depth).. action
             return
@@ -155,9 +184,20 @@ function step_stack.peak()
     return step_stack[#step_stack]
 end
 
-
-function M.generate_one_step()
-    print("aaaa" .. #step_stack)
+function M.generate_one_step(is_win)
+    print("generate_one_step")
+   -- print("step stack is " .. #step_stack.."is win "..is_win)
+    if not is_win then
+        M.hard_level = M.hard_level +1
+        if M.hard_level > 3 then
+            M.hard_level = 3
+        end
+    else
+        M.hard_level = M.hard_level -1
+        if M.hard_level < 1 then
+            M.hard_level = 1
+        end
+    end
     if #step_stack == 0 then
         return "finished", ""
     end
@@ -179,15 +219,24 @@ function M.generate_one_step()
         next_action = action
         break
     end
+    for _,action in pairs(cur_step.sequence) do
+        print(action)
+    end
     if next_action == nil then
         return "finished", ""
     end
     table.remove(cur_step.sequence, 1)
     -- expand
     if string.match(next_action, '>.-$') == nil then
-        step_stack.push(M.random_from(M.actions[next_action]))
+        if M.actions.Has_Level(next_action, M.hard_level) then
+            step_stack.push(M.random_from(M.actions[next_action]))
+            print("action " .. next_action .. "has level " .. M.hard_level)
+        else 
+            step_stack.push(M.random_from(M.actions[next_action]))
+            print("action " ..next_action .. "does not have level ".. M.hard_level)
+        end
     end
-    return cur_step.description, next_action
+    return cur_step.description , next_action
 
 end
 
@@ -202,7 +251,7 @@ end
 
 function M.padding_by( numbers )
     padding = "  "
-    for i = 1, numbers, 1 do 
+    for i = 1, numbers, 1 do
         padding = padding .. padding
     end
     return padding
