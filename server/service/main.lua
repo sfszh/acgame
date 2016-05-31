@@ -26,13 +26,14 @@ function handler.on_message(ws, message)
     if message == "map" then
         questgen.init_onestep();
         all_text = generate_and_pack(true);
+        --all_text = generate_and_pack(true);
     elseif message == "win" then
         all_text = generate_and_pack(true);
     else
         all_text = generate_and_pack(false);
     end
     -- end
-    print("send" .. all_text);
+    print("send " .. all_text);
     ws:send_text(all_text);
     -- ws:close()
 end
@@ -85,12 +86,12 @@ skynet.start(function()
        socket.start(id)
        pcall(handle_socket, id)
     end)
-    -- questgen.init_onestep()
-    -- questgen.generate_one_step()
-    -- repeat
-        -- local desc, action = questgen.generate_one_step()
-        -- print(desc .. " " .. action)
-    -- until(desc == "finished")
+     questgen.init_onestep()
+     questgen.generate_one_step()
+     repeat
+         local desc, action = questgen.generate_one_step()
+         print(desc .. " " .. action)
+     until(desc == "finished")
     -- output = os.execute('perl /home/vagrant/loc/acgame/server/lualib/gistfile1.pl')
     -- print(output)
 end)

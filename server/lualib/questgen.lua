@@ -45,18 +45,18 @@ M.actions = {
     },
     ['kill'] = {
         {
-            description = 'Go someplace and kill all the monsters',
-            sequence = {'goto', '>kill'},
+            description = '[easy]Go someplace and kill all the monsters',
+            sequence = { '>kill'},
             level = 1
         },
         {
-            description = 'Go someplace and kill all the monsters',
-            sequence = {'goto', '>kill'},
+            description = '[normal]Go someplace and kill all the monsters',
+            sequence = { '>kill'},
             level = 2
         },
         {
-            description = 'Go someplace and kill all the monsters',
-            sequence = {'goto', '>kill'},
+            description = '[hard]Go someplace and kill all the monsters',
+            sequence = {'>kill'},
             level = 3
         }
     },
@@ -65,10 +65,10 @@ M.actions = {
     function M.actions.Has_Level(name_type, level)
         for _,action in pairs(M.actions[name_type]) do
             if action.level == level then
-                return true
+                return action
             end
         end
-        return false
+        return nil
     end
     --]]
 M.motivations = {
@@ -91,15 +91,16 @@ M.motivations = {
     },
     --]]
     ['reputation'] = {
-        --[[
+       -- --[[
         {
-            description ='Obtainrare items',
+            description ='Obtain rare items',
             sequence    = {'get', 'goto', '>give'}
         },
         --]]
+        --[[
         {
             description = 'Kill enemies',
-            sequence    = {'goto', 'kill', 'goto', '>report'},
+            sequence    = {'kill', 'kill', 'kill','kill','goto','>report'},
         },
         --[[
         {
@@ -185,14 +186,15 @@ function step_stack.peak()
 end
 
 function M.generate_one_step(is_win)
-    print("generate_one_step")
    -- print("step stack is " .. #step_stack.."is win "..is_win)
-    if not is_win then
+    if is_win then
+    print("generate_one_step is win ") --.. is_win)
         M.hard_level = M.hard_level +1
         if M.hard_level > 3 then
             M.hard_level = 3
         end
     else
+    print("generate_one_step is lose") --.. is_win)
         M.hard_level = M.hard_level -1
         if M.hard_level < 1 then
             M.hard_level = 1
@@ -219,23 +221,21 @@ function M.generate_one_step(is_win)
         next_action = action
         break
     end
-    for _,action in pairs(cur_step.sequence) do
-        print(action)
-    end
     if next_action == nil then
         return "finished", ""
     end
     table.remove(cur_step.sequence, 1)
-    -- expand
+    ---- expand
     if string.match(next_action, '>.-$') == nil then
-        if M.actions.Has_Level(next_action, M.hard_level) then
-            step_stack.push(M.random_from(M.actions[next_action]))
-            print("action " .. next_action .. "has level " .. M.hard_level)
+        if M.actions.Has_Level(next_action, M.hard_level) ~= nil then
+            step_stack.push(M.actions.Has_Level(next_action, M.hard_level))
+            print("action " .. next_action .. " has level " .. M.hard_level)
         else 
             step_stack.push(M.random_from(M.actions[next_action]))
-            print("action " ..next_action .. "does not have level ".. M.hard_level)
+            print("action " ..next_action .. " does not have level ".. M.hard_level)
         end
     end
+    --print("description " 
     return cur_step.description , next_action
 
 end
