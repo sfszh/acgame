@@ -1,10 +1,11 @@
+local Tree = require "tree"
 local M= {}
 
 
 M.actions = {
     ['goto'] ={
         {
-            description = 'Just wander around and look',
+            description = 'go to someplace',
             sequence = {'>explore'},
             level = 1
         }
@@ -45,21 +46,41 @@ M.actions = {
     },
     ['kill'] = {
         {
-            description = '[easy]Go someplace and kill all the monsters',
+            description = '[easy] you just need to kill an easier monster',
             sequence = { '>kill'},
             level = 1
         },
         {
-            description = '[normal]Go someplace and kill all the monsters',
+            description = '[normal]you need to kill an monster',
             sequence = { '>kill'},
             level = 2
         },
         {
-            description = '[hard]Go someplace and kill all the monsters',
+            description = '[hard] aha you need to kill a very challenging monster',
             sequence = {'>kill'},
             level = 3
         }
     },
+    ['explore'] = {
+        {
+            description = '[easy] you only need to look around',
+            level = 1
+        },
+        {
+            description = '[normal] you need to around',
+            level = 2
+        },
+        {
+            description = '[hard] you really need to look hardly',
+            level = 3
+        }
+    },
+    ['report'] = {
+        {
+            description = 'return and report',
+            level = 1
+        }
+    }
 }
 ---[[
     function M.actions.Has_Level(name_type, level)
@@ -91,16 +112,16 @@ M.motivations = {
     },
     --]]
     ['reputation'] = {
-       -- --[[
+       --[[
         {
             description ='Obtain rare items',
             sequence    = {'get', 'goto', '>give'}
         },
         --]]
-        --[[
+        ----[[
         {
             description = 'Kill enemies',
-            sequence    = {'kill', 'kill', 'kill','kill','goto','>report'},
+            sequence    = {'kill','goto','>report'},
         },
         --[[
         {
@@ -170,6 +191,65 @@ function M.generate_step(sequence)
             -- print(action)
         end
     end
+end
+
+function M.generate_tree_0()
+    local tree = Tree:new()
+    tree(2):set("2") 
+    tree(1):set("1")
+    tree(1)(2):set("12")
+    tree(1)(1):set("11")
+    tree(1)(3):set("13")
+    tree(1)(1)(1):set("111")
+    return tree
+end
+
+function M.generate_tree()
+    local motivation = M.random_from(M.random_from(M.motivations))
+    local tree = Tree:new()
+    tree:set(motivation.description)
+    print("Generating a Quest for "..motivation.description .. ":" .. M.sequence_to_str(motivation.sequence))
+    tree:newChild(1,"")
+    M.generate_tree_step(tree[1],motivation.sequence)
+    return tree
+end
+
+function M.generate_tree_step(node, sequence)
+    for _,action in pairs(sequence) do
+        if string.match(action, '>.-$') == nil then
+            local step = M.random_from( M.actions[action])
+            --M.generated_steps[#M.generated_steps + 1] = M.padding_by(M.depth)..step.description .. ":" .. M.sequence_to_str(step.sequence)
+            print("step" .. step.description)
+            node:newChild(1,step.description)
+            M.depth = M.depth + 1
+            -- print("match")
+            M.generate_tree_step(node[1], step.sequence)
+        else
+            M.depth = M.depth - 1
+            print("action" .. action)
+            --M.generated_steps[#M.generated_steps + 1] = M.padding_by(M.depth).. action
+            node.parent:newChild(nil,action)
+            return
+            -- print(action)
+        end
+    end
+end
+
+function M.get_desc(action_name, level) 
+    
+    if string.match(action_name, '>.-$') ~= nil then
+        action_name = string.sub(action_name,2)
+        print("yo" ..action_name)
+    end
+    if M.actions[action_name] == nil then
+        return "invalid"
+    end
+    for _, action in pairs(M.actions[action_name]) do
+        if action.level == level then
+            return action.description
+        end
+    end
+    return M.random_from(M.actions[action_name]).description
 end
 
 step_stack = {}
